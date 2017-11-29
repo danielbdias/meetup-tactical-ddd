@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  exam-evaluation:
+    command: "sh start_app.sh"
+    image: python
+    working_dir: /project
+    volumes:
+      - ./exam-evaluation-app:/project
+    links:
+      - exam
+    environment:
+      - DATABASE_HOST=postgres
+    ports:
+      - 5000:5000
+
+  exam:
+    build: ./exam-app
+    command: "bash -c 'yarn && yarn start'"
+    volumes:
+      - ./exam-app:/project
+    links:
+      - postgres
+    environment:
+      - DATABASE_HOST=postgres
+    ports:
+      - 8000:8000
+
+  postgres:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=root
+      - POSTGRES_DB=exams
+    ports:
+      - 5432:5432
